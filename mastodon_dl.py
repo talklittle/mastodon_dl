@@ -39,7 +39,8 @@ def parse_args():
 def init_mastodon(email, password, client_secret, api_base_url):
     mastodon = Mastodon(
         client_id=client_secret,
-        api_base_url=api_base_url
+        api_base_url=api_base_url,
+        ratelimit_method='pace'
     )
     mastodon.log_in(
         email,
