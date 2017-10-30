@@ -49,15 +49,5 @@ def init_mastodon(email, password, client_secret, api_base_url):
     return mastodon
 
 
-def register_app():
-    """
-    Mastodon.create_app(
-        'example',
-        api_base_url='https://mastodon.social',
-        to_file='example-clientcred.secret'
-    )
-    """
-
-
 if __name__ == '__main__':
     main()
