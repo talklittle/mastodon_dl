@@ -14,12 +14,22 @@ def main():
         args.secret_file,
         args.api_base_url
     )
-    timeline = mastodon.timeline(
-        timeline=args.timeline,
-        max_id=args.max_id,
-        since_id=args.since_id,
-        limit=args.limit
-    )
+
+    if args.account is not None:
+        timeline = timeline_from_username(
+            args.account,
+            max_id=args.max_id,
+            since_id=args.since_id,
+            limit=args.limit,
+            mastodon=mastodon
+        )
+    else:
+        timeline = mastodon.timeline(
+            timeline=args.timeline,
+            max_id=args.max_id,
+            since_id=args.since_id,
+            limit=args.limit
+        )
 
     page = timeline
     while page is not None:
@@ -31,6 +41,8 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Download media from a Mastodon feed.')
+    parser.add_argument('account', help='(Optional) Username to look up. '
+                                        'If unspecified, use timeline instead.')
     parser.add_argument('-o', '--output-dir',
                         default=os.path.join(os.curdir, 'downloads'),
                         help='Directory to save files')
@@ -60,6 +72,19 @@ def init_mastodon(email, password, client_secret, api_base_url):
     return mastodon
 
 
+def timeline_from_username(username, max_id, since_id, limit, mastodon):
+    users = mastodon.account_search(username)
+    if users is not None and len(users) > 0:
+        return mastodon.account_statuses(
+            users[0]['id'],
+            max_id=max_id,
+            since_id=since_id,
+            limit=limit
+        )
+    else:
+        return None
+
+
 def process_page(page, output_dir):
     for toot in page:
         media_attachments = toot['media_attachments']
@@ -77,7 +102,7 @@ def process_page(page, output_dir):
 
                 out_path = os.path.join(output_dir, out_filename)
                 if os.path.exists(out_path):
-                    print("Skipping %s -- %s exists" % (url, out_path))
+                    print('Skipping %s -- %s exists' % (url, out_path))
                 else:
                     stream_to_file(url, out_path)
 
@@ -94,9 +119,9 @@ def stream_to_file(url, out_path):
             with open(out_path, 'wb') as fd:
                 for chunk in r.iter_content(chunk_size=128):
                     fd.write(chunk)
-            print("Downloaded %s to %s" % (url, out_path))
+            print('Downloaded %s to %s' % (url, out_path))
         except KeyboardInterrupt:
-            print("Error downloading %s to %s" % (url, out_path))
+            print('Error downloading %s to %s' % (url, out_path))
             os.remove(out_path)
 
 
