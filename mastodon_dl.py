@@ -41,14 +41,15 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Download media from a Mastodon feed.')
-    parser.add_argument('account', help='(Optional) Username to look up. '
-                                        'If unspecified, use timeline instead.')
+    parser.add_argument('-u', '--email', required=True, help='Email address for login')
+    parser.add_argument('-p', '--password', required=True, help='Password for login')
+    parser.add_argument('-s', '--secret-file', required=True,
+                        help='Path to API client secret file')
+    parser.add_argument('-a', '--account',
+                        help='Username to lookup. If unspecified, use timeline instead.')
     parser.add_argument('-o', '--output-dir',
                         default=os.path.join(os.curdir, 'downloads'),
                         help='Directory to save files')
-    parser.add_argument('-u', '--email', help='Email address for login')
-    parser.add_argument('-p', '--password', help='Password for login')
-    parser.add_argument('-s', '--secret-file', help='Path to API client secret file')
     parser.add_argument('--api-base-url', default='https://mastodon.social',
                         help='URL for Mastodon instance where client is registered')
     parser.add_argument('--timeline', default='home',
