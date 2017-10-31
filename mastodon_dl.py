@@ -24,7 +24,7 @@ def main():
     page = timeline
     while page is not None:
         process_page(page, args.output_dir)
-        page = mastodon.fetch_next(timeline)
+        page = mastodon.fetch_next(page)
 
     print('Done!')
 
